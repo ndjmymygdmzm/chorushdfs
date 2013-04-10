@@ -5,9 +5,10 @@ import com.emc.greenplum.hadoop.HdfsVersion;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.BeforeClass;
 
-import java.io.File;
-import java.io.PrintStream;
+import java.io.*;
+import java.util.Properties;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
@@ -21,6 +22,15 @@ import static org.junit.Assert.assertNull;
  * To change this template use File | Settings | File Templates.
  */
 public class IntegrationTest {
+
+    static Properties properties = new Properties();
+
+    @BeforeClass
+    public static void onlyOnce() throws Exception {
+        InputStream stream = new FileInputStream("src/test/com/emc/greenplum/hadoop/plugin/servers.properties");
+        properties.load(stream);
+    }
+
     @Before
     public void setUp() throws Exception {
         Hdfs.setLoggerStream(new PrintStream(new File("/dev/null")));
@@ -34,42 +44,42 @@ public class IntegrationTest {
 
     @Test
     public void testMapRPlugin() throws Exception {
-        Hdfs hdfs = new Hdfs("chorus-gpmr12.sf.pivotallabs.com", "7222", "root");
+        Hdfs hdfs = new Hdfs(properties.getProperty("gpmr12.hostname"), properties.getProperty("gpmr12.port"), properties.getProperty("gpmr12.user"));
         assertEquals(HdfsVersion.V0202MAPR, hdfs.getVersion());
         assertNotSame(0, hdfs.list("/").size());
     }
 
     @Test
     public void testGphd11Plugin() throws Exception {
-        Hdfs hdfs = new Hdfs("chorus-gphd11.sf.pivotallabs.com", "8020", "root");
+        Hdfs hdfs = new Hdfs(properties.getProperty("gphd11.hostname"), properties.getProperty("gphd11.port"), properties.getProperty("gphd11.user"));
         assertEquals(HdfsVersion.V1, hdfs.getVersion());
         assertNotSame(0, hdfs.list("/").size());
     }
 
     @Test
     public void testGphd12Plugin() throws Exception {
-        Hdfs hdfs = new Hdfs("chorus-gphd12.sf.pivotallabs.com", "8020", "root");
+        Hdfs hdfs = new Hdfs(properties.getProperty("gphd12.hostname"), properties.getProperty("gphd12.port"), properties.getProperty("gphd12.user"));
         assertEquals(HdfsVersion.V1, hdfs.getVersion());
         assertNotSame(0, hdfs.list("/").size());
     }
 
     @Test
     public void testGphd20Plugin() throws Exception {
-        Hdfs hdfs = new Hdfs("chorus-gphd20-1.sf.pivotallabs.com", "9000", "root");
+        Hdfs hdfs = new Hdfs(properties.getProperty("gphd20.hostname"), properties.getProperty("gphd20.port"), properties.getProperty("gphd20.user"));
         assertEquals(HdfsVersion.V2, hdfs.getVersion());
         assertNotSame(0, hdfs.list("/").size());
     }
 
     @Test
     public void testGphd02Plugin() throws Exception {
-        Hdfs hdfs = new Hdfs("chorus-gphd02.sf.pivotallabs.com", "8020", "root");
+        Hdfs hdfs = new Hdfs(properties.getProperty("gphd02.hostname"), properties.getProperty("gphd02.port"), properties.getProperty("gphd02.user"));
         assertEquals(HdfsVersion.V0201GP, hdfs.getVersion());
         assertNotSame(0, hdfs.list("/").size());
     }
 
     @Test
     public void testVersionChange() throws Exception {
-        Hdfs hdfs = new Hdfs("chorus-gphd02.sf.pivotallabs.com", "8020", "root", HdfsVersion.V1);
+        Hdfs hdfs = new Hdfs(properties.getProperty("gphd02.hostname"), properties.getProperty("gphd02.port"), properties.getProperty("gphd02.user"), HdfsVersion.V1);
         assertEquals(HdfsVersion.V0201GP, hdfs.getVersion());
         assertNotSame(0, hdfs.list("/").size());
     }
