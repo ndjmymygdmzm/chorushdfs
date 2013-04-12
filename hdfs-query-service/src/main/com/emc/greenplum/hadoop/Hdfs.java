@@ -117,7 +117,6 @@ public class Hdfs {
     private static boolean checkVersion(final String host, final String port, final String username, HdfsVersion version) {
         if (version == null) { return false; }
         HdfsFileSystem fileSystem = getPluginLoader().fileSystem(version);
-//        HdfsFileSystem fileSystem = new HdfsFileSystemImpl();
 
         final HdfsFileSystem fileSystem1 = fileSystem;
         protectTimeout(new Callable() {
@@ -141,8 +140,6 @@ public class Hdfs {
         }
 
         HdfsFileSystem fileSystem = getPluginLoader().fileSystem(version);
-//        HdfsFileSystem fileSystem = new HdfsFileSystemImpl();
-
         fileSystem.loadFileSystem(host, port, username);
         return fileSystem;
     }

@@ -2,6 +2,10 @@ package test.com.emc.greenplum.hadoop.plugins;
 import com.emc.greenplum.hadoop.plugins.HdfsFileSystem;
 import com.emc.greenplum.hadoop.plugins.HdfsFileSystemImpl;
 import org.junit.Test;
+import org.junit.BeforeClass;
+
+import java.io.*;
+import java.util.Properties;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
@@ -18,10 +22,18 @@ import static org.junit.Assert.assertNull;
  * To change this template use File | Settings | File Templates.
  */
 public class HdfsFileSystemImplTest {
+    static Properties properties = new Properties();
+
+    @BeforeClass
+    public static void onlyOnce() throws Exception {
+        InputStream stream = new FileInputStream("src/test/com/emc/greenplum/hadoop/plugin/servers.properties");
+        properties.load(stream);
+    }
+
     @Test
     public void testHdfsFileSystemImpl() {
         HdfsFileSystem hdfs = new HdfsFileSystemImpl();
-        hdfs.loadFileSystem("chorus-gphd20-1.sf.pivotallabs.com", "9000", "root");
+        hdfs.loadFileSystem(properties.getProperty("gphd20.hostname"), properties.getProperty("gphd20.port"), properties.getProperty("gphd20.user"));
         assertNotNull(hdfs);
     }
 }
