@@ -10,9 +10,7 @@ import org.junit.BeforeClass;
 import java.io.*;
 import java.util.Properties;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -87,6 +85,12 @@ public class IntegrationTest {
     @Test
     public void testFindNonExistantServerVersion() throws Exception {
         Hdfs hdfs = new Hdfs("this.doesnt.exist.com", "1234", "root");
+        assertNull(hdfs.getVersion());
+    }
+
+    @Test
+    public void testValidHostnameInvalidCredentials() throws Exception {
+        Hdfs hdfs = new Hdfs(properties.getProperty("gphd20.hostname"), "1234", "root");
         assertNull(hdfs.getVersion());
     }
 }

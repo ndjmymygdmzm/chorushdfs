@@ -84,6 +84,14 @@ public class HdfsFileSystemImpl extends HdfsFileSystemPlugin {
 
     @Override
     public boolean loadedSuccessfully() {
-        return fileSystem != null;
+        if (fileSystem != null) {
+            try {
+                return fileSystem.exists(new Path("/"));
+            } catch (IOException e) {
+                return false;
+            }
+        } else {
+            return false;
+        }
     }
 }
