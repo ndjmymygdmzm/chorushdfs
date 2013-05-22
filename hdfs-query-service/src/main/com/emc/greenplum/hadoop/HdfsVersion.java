@@ -9,12 +9,6 @@ package com.emc.greenplum.hadoop;
  */
 
 public enum HdfsVersion {
-    V0202MAPR("0.20.2mr", "META-INF/plugins/hdfs-plugin-v0-20-2mr-0.0.1.jar", new String []{
-            "META-INF/external-deps/commons-logging-1.1.1.jar",
-            "META-INF/external-deps/maprfs-0.1.jar",
-            "META-INF/external-deps/zookeeper-3.3.2.jar",
-            "META-INF/external-deps/hadoop-0.20.2mr-core.jar"
-    }),
     V1("1.0.0", "META-INF/plugins/hdfs-plugin-v1-0.0.1.jar", new String[] {
             "META-INF/external-deps/commons-logging-1.1.1.jar",
             "META-INF/external-deps/commons-lang-2.4.jar",
@@ -39,6 +33,12 @@ public enum HdfsVersion {
             "META-INF/external-deps/hadoop-annotations-2.0.2-alpha-gphd-2.0.1.jar",
             "META-INF/external-deps/hadoop-common-2.0.2-alpha-gphd-2.0.1.jar",
             "META-INF/external-deps/hadoop-hdfs-2.0.2-alpha-gphd-2.0.1.jar"
+    }),
+    V0202MAPR("0.20.2mr", "META-INF/plugins/hdfs-plugin-v0-20-2mr-0.0.1.jar", new String []{
+            "META-INF/external-deps/commons-logging-1.1.1.jar",
+            "META-INF/external-deps/maprfs-0.1.jar",
+            "META-INF/external-deps/zookeeper-3.3.2.jar",
+            "META-INF/external-deps/hadoop-0.20.2mr-core.jar"
     });
 
     private String pluginJar;
