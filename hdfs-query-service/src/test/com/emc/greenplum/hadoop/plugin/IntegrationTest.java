@@ -76,14 +76,20 @@ public class IntegrationTest {
     }
 
     @Test
-    public void testVersionChange() throws Exception {
+    public void testGivingUpWhenTheSpecifiedVersionDoesNotConnect() throws Exception {
         Hdfs hdfs = new Hdfs(properties.getProperty("gphd02.hostname"), properties.getProperty("gphd02.port"), properties.getProperty("gphd02.user"), HdfsVersion.V1);
-        assertEquals(HdfsVersion.V0201GP, hdfs.getVersion());
-        assertNotSame(0, hdfs.list("/").size());
+        assertNull(hdfs.list("/"));
     }
 
     @Test
-    public void testFindNonExistantServerVersion() throws Exception {
+    public void testFindingTheCorrectVersionWhenNullIsPassed() throws Exception {
+        Hdfs hdfs = new Hdfs(properties.getProperty("gphd02.hostname"), properties.getProperty("gphd02.port"), properties.getProperty("gphd02.user"), (HdfsVersion) null);
+        assertEquals(HdfsVersion.V0201GP, hdfs.getVersion());
+        assertNotNull(hdfs.list("/"));
+    }
+
+    @Test
+    public void testFindNonExistentServerVersion() throws Exception {
         Hdfs hdfs = new Hdfs("this.doesnt.exist.com", "1234", "root");
         assertNull(hdfs.getVersion());
     }

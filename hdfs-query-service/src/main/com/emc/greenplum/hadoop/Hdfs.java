@@ -28,13 +28,16 @@ public class Hdfs {
     }
 
     public Hdfs(String host, String port, String username, HdfsVersion version) {
-        if (checkVersion(host, port, username, version)) {
-            this.version = version;
-        } else {
-            this.version = detectVersion(host, port, username);
-        }
-        fileSystem = loadFileSystem(host, port, username);
-    }
+         if(version == null){
+             this.version = detectVersion(host, port, username);
+         }
+         else if (checkVersion(host, port, username, version)) {
+             this.version = version;
+         }
+
+         this.fileSystem = loadFileSystem(host, port, username);
+     }
+
 
     public Hdfs(String host, String port, String username, String versionName) {
         this(host, port, username, HdfsVersion.findVersion(versionName));
