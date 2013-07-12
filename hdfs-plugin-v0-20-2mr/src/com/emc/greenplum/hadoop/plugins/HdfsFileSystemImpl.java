@@ -5,19 +5,15 @@ import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.sql.Time;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-/**
- * Created with IntelliJ IDEA.
- * User: pivotal
- * Date: 5/21/12
- * Time: 3:14 PM
- * To change this template use File | Settings | File Templates.
- */
+
 public class HdfsFileSystemImpl extends HdfsFileSystemPlugin {
     private FileSystem fileSystem;
 
@@ -59,7 +55,7 @@ public class HdfsFileSystemImpl extends HdfsFileSystemPlugin {
 
             entity.setDirectory(fileStatus.isDir());
             entity.setPath(fileStatus.getPath().toUri().getPath());
-            entity.setModifiedAt(new Time(fileStatus.getModificationTime()));
+            entity.setModifiedAt(new Date(fileStatus.getModificationTime()));
             entity.setSize(fileStatus.getLen());
 
             if (fileStatus.isDir()) {
@@ -78,12 +74,36 @@ public class HdfsFileSystemImpl extends HdfsFileSystemPlugin {
     }
 
     @Override
-    public DataInputStream open(String path) throws IOException {
-        return fileSystem.open(new Path(path));
+    public boolean loadedSuccessfully() {
+        return fileSystem != null;
     }
 
     @Override
-    public boolean loadedSuccessfully() {
-        return fileSystem != null;
+    public List<String> getContent(String path, int lineCount) throws IOException {
+        FileStatus[] files = fileSystem.globStatus(new Path(path));
+        ArrayList<String> lines = new ArrayList<String>();
+
+        for (FileStatus file : files) {
+
+            if (lines.size() >= lineCount) { break; }
+
+            if (!file.isDir()) {
+
+                DataInputStream in = fileSystem.open(file.getPath());
+
+                BufferedReader dataReader = new BufferedReader(new InputStreamReader(in));
+
+                String line = dataReader.readLine();
+                while (line != null && lines.size() < lineCount) {
+                    lines.add(line);
+                    line = dataReader.readLine();
+                }
+
+                dataReader.close();
+                in.close();
+            }
+
+        }
+        return lines;
     }
 }
