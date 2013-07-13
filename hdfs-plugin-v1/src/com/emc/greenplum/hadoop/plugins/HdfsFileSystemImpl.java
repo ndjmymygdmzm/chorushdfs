@@ -76,26 +76,28 @@ public class HdfsFileSystemImpl extends HdfsFileSystemPlugin {
         FileStatus[] files = fileSystem.globStatus(new Path(path));
         ArrayList<String> lines = new ArrayList<String>();
 
-        for (FileStatus file : files) {
+        if (files != null) {
+            for (FileStatus file : files) {
 
-            if (lines.size() >= lineCount) { break; }
+                if (lines.size() >= lineCount) { break; }
 
-            if (!file.isDir()) {
+                if (!file.isDir()) {
 
-                DataInputStream in = fileSystem.open(file.getPath());
+                    DataInputStream in = fileSystem.open(file.getPath());
 
-                BufferedReader dataReader = new BufferedReader(new InputStreamReader(in));
+                    BufferedReader dataReader = new BufferedReader(new InputStreamReader(in));
 
-                String line = dataReader.readLine();
-                while (line != null && lines.size() < lineCount) {
-                    lines.add(line);
-                    line = dataReader.readLine();
+                    String line = dataReader.readLine();
+                    while (line != null && lines.size() < lineCount) {
+                        lines.add(line);
+                        line = dataReader.readLine();
+                    }
+
+                    dataReader.close();
+                    in.close();
                 }
 
-                dataReader.close();
-                in.close();
             }
-
         }
         return lines;
     }
