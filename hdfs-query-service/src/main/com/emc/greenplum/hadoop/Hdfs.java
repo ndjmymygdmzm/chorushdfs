@@ -4,6 +4,7 @@ import com.emc.greenplum.hadoop.plugin.HdfsCachedPluginBuilder;
 import com.emc.greenplum.hadoop.plugin.HdfsPluginBuilder;
 import com.emc.greenplum.hadoop.plugins.HdfsEntity;
 import com.emc.greenplum.hadoop.plugins.HdfsFileSystem;
+import com.emc.greenplum.hadoop.plugins.HdfsPair;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -23,24 +24,23 @@ public class Hdfs {
         loggerStream = stream;
     }
 
-    public Hdfs(String host, String port, String username ) {
-        this(host, port, username, detectVersion(host, port, username));
+    public Hdfs(String host, String port, String username, boolean isHA, List<HdfsPair> parameters) {
+        this(host, port, username, detectVersion(host, port, username, isHA, parameters), isHA, parameters);
     }
 
-    public Hdfs(String host, String port, String username, HdfsVersion version) {
+    public Hdfs(String host, String port, String username, HdfsVersion version, boolean isHA, List<HdfsPair> parameters) {
          if(version == null){
-             this.version = detectVersion(host, port, username);
+             this.version = detectVersion(host, port, username, isHA, parameters);
          }
-         else if (checkVersion(host, port, username, version)) {
+         else if (checkVersion(host, port, username, version, isHA, parameters)) {
              this.version = version;
          }
 
-         this.fileSystem = loadFileSystem(host, port, username);
+         this.fileSystem = loadFileSystem(host, port, username, isHA, parameters);
      }
 
-
-    public Hdfs(String host, String port, String username, String versionName) {
-        this(host, port, username, HdfsVersion.findVersion(versionName));
+    public Hdfs(String host, String port, String username, String versionName, boolean isHA, List<HdfsPair> parameters) {
+        this(host, port, username, HdfsVersion.findVersion(versionName), isHA, parameters);
     }
 
     public HdfsVersion getVersion() {
@@ -108,24 +108,24 @@ public class Hdfs {
         return pluginLoader;
     }
 
-    private static HdfsVersion detectVersion(String host, String port, String username) {
+    private static HdfsVersion detectVersion(String host, String port, String username, boolean isHA, List<HdfsPair> parameters) {
         for (HdfsVersion version : HdfsVersion.values()) {
-            if (checkVersion(host, port, username, version)) {
+            if (checkVersion(host, port, username, version, isHA, parameters)) {
                 return version;
             }
         }
         return null;
     }
 
-    private static boolean checkVersion(final String host, final String port, final String username, HdfsVersion version) {
+    private static boolean checkVersion(final String host, final String port, final String username, HdfsVersion version, final boolean isHA, final List<HdfsPair> parameters) {
         if (version == null) { return false; }
         HdfsFileSystem fileSystem = getPluginLoader().fileSystem(version);
 
         final HdfsFileSystem fileSystem1 = fileSystem;
         protectTimeout(new Callable() {
             public Object call() {
-                fileSystem1.loadFileSystem(host, port, username);
-                return  null;
+                fileSystem1.loadFileSystem(host, port, username, isHA, parameters);
+                return null;
             }
         });
 
@@ -137,13 +137,13 @@ public class Hdfs {
         }
     }
 
-    private HdfsFileSystem loadFileSystem(String host, String port, String username) {
+    private HdfsFileSystem loadFileSystem(String host, String port, String username, boolean isHA, List<HdfsPair> parameters) {
         if (version == null) {
             return null;
         }
 
         HdfsFileSystem fileSystem = getPluginLoader().fileSystem(version);
-        fileSystem.loadFileSystem(host, port, username);
+        fileSystem.loadFileSystem(host, port, username, isHA, parameters);
         return fileSystem;
     }
 }

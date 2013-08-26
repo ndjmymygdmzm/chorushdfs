@@ -14,13 +14,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
-/**
- * Created with IntelliJ IDEA.
- * User: pivotal
- * Date: 2/28/13
- * Time: 2:24 PM
- * To change this template use File | Settings | File Templates.
- */
+
+
 public class HdfsFileSystemImplTest {
     static Properties properties = new Properties();
 
@@ -33,7 +28,7 @@ public class HdfsFileSystemImplTest {
     @Test
     public void testHdfsFileSystemImpl() {
         HdfsFileSystem hdfs = new HdfsFileSystemImpl();
-        hdfs.loadFileSystem(properties.getProperty("gphd20.hostname"), properties.getProperty("gphd20.port"), properties.getProperty("gphd20.user"));
+        hdfs.loadFileSystem(properties.getProperty("gphd20.hostname"), properties.getProperty("gphd20.port"), properties.getProperty("gphd20.user"), false, null);
         assertNotNull(hdfs);
     }
 }

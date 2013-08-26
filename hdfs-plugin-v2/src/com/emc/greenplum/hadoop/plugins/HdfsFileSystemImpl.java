@@ -18,10 +18,18 @@ public class HdfsFileSystemImpl extends HdfsFileSystemPlugin {
     private FileSystem fileSystem;
 
     @Override
-    public void loadFileSystem(String host, String port, String username) {
+    public void loadFileSystem(String host, String port, String username, boolean isHA, List<HdfsPair> parameters) {
         loadHadoopClassLoader();
         Configuration config = new Configuration();
-        config.set("fs.defaultFS", "hdfs://" + host + ":" + port);
+
+        config.set("fs.defaultFS", buildHdfsPath(host, port, isHA));
+
+        if (parameters != null && parameters.size() > 0) {
+            for (HdfsPair pair : parameters) {
+                config.set(pair.getKey(), pair.getValue());
+            }
+        }
+
         config.set("fs.hdfs.impl", "org.apache.hadoop.hdfs.DistributedFileSystem");
 
         // some magic to make file contents readable using the existing getContents implementation

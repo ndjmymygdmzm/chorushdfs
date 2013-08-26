@@ -18,13 +18,19 @@ public class HdfsFileSystemImpl extends HdfsFileSystemPlugin {
     private FileSystem fileSystem;
 
     @Override
-    public void loadFileSystem(String host, String port, String username) {
+    public void loadFileSystem(String host, String port, String username, boolean isHA, List<HdfsPair> parameters) {
         loadHadoopClassLoader();
 
         Configuration config = new Configuration();
-        config.set("fs.default.name", "hdfs://" + host + ":" + port);
+        config.set("fs.default.name", buildHdfsPath(host, port, isHA));
         config.set("hadoop.job.ugi", username + ", " + username);
         config.set("fs.hdfs.impl", "com.mapr.fs.MapRFileSystem");
+
+        if (parameters != null && parameters.size() > 0) {
+            for (HdfsPair pair : parameters) {
+                config.set(pair.getKey(), pair.getValue());
+            }
+        }
 
         try {
             FileSystem tmpFileSystem = FileSystem.get(config);

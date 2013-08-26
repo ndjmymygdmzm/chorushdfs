@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.List;
 
 
-public abstract class HdfsFileSystemPlugin  implements  HdfsFileSystem {
+public abstract class HdfsFileSystemPlugin implements HdfsFileSystem {
     protected JarClassLoader hadoopCl;
     protected ClassLoader originalClassLoader;
 
@@ -25,6 +25,14 @@ public abstract class HdfsFileSystemPlugin  implements  HdfsFileSystem {
     protected void loadHadoopClassLoader() {
         originalClassLoader = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(hadoopCl);
+    }
+
+    protected String buildHdfsPath(String host, String port, boolean isHA) {
+        if (isHA) {
+            return "hdfs://" + host;
+        } else {
+            return "hdfs://" + host + ":" + port;
+        }
     }
 
 }
