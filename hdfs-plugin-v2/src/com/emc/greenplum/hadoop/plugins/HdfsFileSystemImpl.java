@@ -4,11 +4,14 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.security.UserGroupInformation;
+import org.apache.hadoop.security.authorize.AuthorizationException;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.security.AccessControlException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -24,16 +27,18 @@ public class HdfsFileSystemImpl extends HdfsFileSystemPlugin {
 
         config.set("fs.defaultFS", buildHdfsPath(host, port, isHA));
 
+        config.set("fs.hdfs.impl", "org.apache.hadoop.hdfs.DistributedFileSystem");
+
+        // some magic to make file contents readable using the existing getContents implementation
+        config.set("dfs.client.use.legacy.blockreader", "true");
+
         if (parameters != null && parameters.size() > 0) {
             for (HdfsPair pair : parameters) {
                 config.set(pair.getKey(), pair.getValue());
             }
         }
-
-        config.set("fs.hdfs.impl", "org.apache.hadoop.hdfs.DistributedFileSystem");
-
-        // some magic to make file contents readable using the existing getContents implementation
-        config.set("dfs.client.use.legacy.blockreader", "true");
+		
+		UserGroupInformation.setConfiguration(config);
 
         try {
             fileSystem = FileSystem.get(FileSystem.getDefaultUri(config), config, username);
@@ -87,6 +92,9 @@ public class HdfsFileSystemImpl extends HdfsFileSystemPlugin {
             try {
                 return fileSystem.exists(new Path("/"));
             } catch (IOException e) {
+                System.err.println("V2 plugin cannot load the filesystem root (\"/\")");
+                System.err.println(e.getMessage());
+                e.printStackTrace(System.err);
                 return false;
             }
         } else {

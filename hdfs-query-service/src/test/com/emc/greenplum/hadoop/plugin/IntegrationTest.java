@@ -51,29 +51,29 @@ public class IntegrationTest {
         assertNotSame(0, hdfs.list("/").size());
     }
 
-    @Test
-    public void testClouderaWithHA() throws Exception {
+//    @Test
+//    public void testClouderaWithHA() throws Exception {
+//
+//        List<HdfsPair> params = new ArrayList<HdfsPair>();
+//
+//        for (Object o: properties.keySet()) {
+//            String key = (String) o;
+//            if ( key.startsWith("dfs.") ) {
+//                params.add(new HdfsPair(key, properties.getProperty(key)));
+//            }
+//        }
+//
+//        Hdfs hdfs = new Hdfs(properties.getProperty("cdhha.hostname"), properties.getProperty("cdhha.port"), properties.getProperty("cdhha.user"), Boolean.valueOf(properties.getProperty("cdhha.ha")), params);
+//        assertEquals(HdfsVersion.V2, hdfs.getVersion());
+//        assertNotSame(0, hdfs.list("/").size());
+//    }
 
-        List<HdfsPair> params = new ArrayList<HdfsPair>();
-
-        for (Object o: properties.keySet()) {
-            String key = (String) o;
-            if ( key.startsWith("dfs.") ) {
-                params.add(new HdfsPair(key, properties.getProperty(key)));
-            }
-        }
-
-        Hdfs hdfs = new Hdfs(properties.getProperty("cdhha.hostname"), properties.getProperty("cdhha.port"), properties.getProperty("cdhha.user"), Boolean.valueOf(properties.getProperty("cdhha.ha")), params);
-        assertEquals(HdfsVersion.V2, hdfs.getVersion());
-        assertNotSame(0, hdfs.list("/").size());
-    }
-
-    @Test
-    public void testGphd12Plugin() throws Exception {
-        Hdfs hdfs = new Hdfs(properties.getProperty("gphd12.hostname"), properties.getProperty("gphd12.port"), properties.getProperty("gphd12.user"), false, null);
-        assertEquals(HdfsVersion.V1, hdfs.getVersion());
-        assertNotSame(0, hdfs.list("/").size());
-    }
+//    @Test
+//    public void testGphd12Plugin() throws Exception {
+//        Hdfs hdfs = new Hdfs(properties.getProperty("gphd12.hostname"), properties.getProperty("gphd12.port"), properties.getProperty("gphd12.user"), false, null);
+//        assertEquals(HdfsVersion.V1, hdfs.getVersion());
+//        assertNotSame(0, hdfs.list("/").size());
+//    }
 
     @Test
     public void testGphd20Plugin() throws Exception {
