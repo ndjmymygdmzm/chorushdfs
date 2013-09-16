@@ -5,13 +5,11 @@ import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.security.UserGroupInformation;
-import org.apache.hadoop.security.authorize.AuthorizationException;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.security.AccessControlException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -41,11 +39,23 @@ public class HdfsFileSystemImpl extends HdfsFileSystemPlugin {
 		UserGroupInformation.setConfiguration(config);
 
         try {
-            fileSystem = FileSystem.get(FileSystem.getDefaultUri(config), config, username);
+            if (isKerberos(config)) {
+                fileSystem = FileSystem.get(FileSystem.getDefaultUri(config), config);
+            } else {
+                fileSystem = FileSystem.get(FileSystem.getDefaultUri(config), config, username);
+            }
+
         } catch (Exception e) {
+            System.err.println("V2 plugin failed FileSystem.get");
+            System.err.println(e.getMessage());
+            e.printStackTrace(System.err);
         } finally {
             restoreOriginalClassLoader();
         }
+    }
+
+    private boolean isKerberos(Configuration config) {
+        return config.get("hadoop.security.authentication", "").equalsIgnoreCase("kerberos");
     }
 
     @Override
