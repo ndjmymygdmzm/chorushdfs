@@ -1,12 +1,5 @@
 package com.emc.greenplum.hadoop;
 
-/**
- * Created with IntelliJ IDEA.
- * User: pivotal
- * Date: 5/22/12
- * Time: 10:35 AM
- * To change this template use File | Settings | File Templates.
- */
 
 public enum HdfsVersion {
     V1("1.0.0", "META-INF/plugins/hdfs-plugin-v1-0.0.1.jar", new String[] {

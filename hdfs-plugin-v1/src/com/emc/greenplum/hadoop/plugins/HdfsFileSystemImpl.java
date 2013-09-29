@@ -107,4 +107,19 @@ public class HdfsFileSystemImpl extends HdfsFileSystemPlugin {
         }
         return lines;
     }
+
+    @Override
+    public HdfsEntityDetails details(String path) throws IOException {
+        FileStatus status = fileSystem.getFileStatus(new Path(path));
+        return new HdfsEntityDetails(
+            status.getOwner(),
+            status.getGroup(),
+            status.getAccessTime(),
+            status.getModificationTime(),
+            status.getBlockSize(),
+            status.getLen(),
+            status.getReplication(),
+            status.getPermission().toString()
+        );
+    }
 }

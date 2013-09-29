@@ -3,13 +3,6 @@ package com.emc.greenplum.hadoop.plugins;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-/**
- * Created with IntelliJ IDEA.
- * User: pivotal
- * Date: 5/18/12
- * Time: 11:53 AM
- * To change this template use File | Settings | File Templates.
- */
 public class HdfsEntity {
     private String path;
     private Date modifiedAt;

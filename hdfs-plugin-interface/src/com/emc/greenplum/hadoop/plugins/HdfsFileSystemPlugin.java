@@ -18,6 +18,9 @@ public abstract class HdfsFileSystemPlugin implements HdfsFileSystem {
     @Override
     public abstract List<String> getContent(String path, int lineCount) throws IOException;
 
+    @Override
+    public abstract HdfsEntityDetails details(String path) throws IOException;
+
     protected void restoreOriginalClassLoader() {
         Thread.currentThread().setContextClassLoader(originalClassLoader);
     }

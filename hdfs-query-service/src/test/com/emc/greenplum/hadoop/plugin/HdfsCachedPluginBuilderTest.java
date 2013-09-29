@@ -1,7 +1,6 @@
 package com.emc.greenplum.hadoop.plugin;
 
 import com.emc.greenplum.hadoop.HdfsVersion;
-import com.emc.greenplum.hadoop.plugins.HdfsFileSystem;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -9,13 +8,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
 import static org.mockito.Mockito.*;
 
-/**
-* Created with IntelliJ IDEA.
-* User: pivotal
-* Date: 8/8/12
-* Time: 6:18 PM
-* To change this template use File | Settings | File Templates.
-*/
+
 public class HdfsCachedPluginBuilderTest {
 
     private HdfsPluginBuilder builder;

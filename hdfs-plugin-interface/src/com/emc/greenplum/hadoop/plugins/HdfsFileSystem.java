@@ -11,11 +11,13 @@ public interface HdfsFileSystem {
 
     void closeFileSystem();
 
-    List<HdfsEntity> list(String path) throws IOException;
-
     boolean loadedSuccessfully();
 
     void setClassLoader(JarClassLoader classLoader);
 
+    List<HdfsEntity> list(String path) throws IOException;
+
     List<String> getContent(String path, int lineCount) throws IOException;
+
+    HdfsEntityDetails details(String path) throws IOException;
 }

@@ -3,6 +3,7 @@ package com.emc.greenplum.hadoop;
 import com.emc.greenplum.hadoop.plugin.HdfsCachedPluginBuilder;
 import com.emc.greenplum.hadoop.plugin.HdfsPluginBuilder;
 import com.emc.greenplum.hadoop.plugins.HdfsEntity;
+import com.emc.greenplum.hadoop.plugins.HdfsEntityDetails;
 import com.emc.greenplum.hadoop.plugins.HdfsFileSystem;
 import com.emc.greenplum.hadoop.plugins.HdfsPair;
 
@@ -66,6 +67,18 @@ public class Hdfs {
                     return fileSystem.getContent(path, lineCount);
                 } catch (IOException e) {
                     return new ArrayList<String>();
+                }
+            }
+        });
+    }
+
+    public HdfsEntityDetails details(final String path) {
+        return protectTimeout(new Callable<HdfsEntityDetails>() {
+            public HdfsEntityDetails call() {
+                try {
+                    return fileSystem.details(path);
+                } catch (IOException e) {
+                    return new HdfsEntityDetails();
                 }
             }
         });
