@@ -11,7 +11,7 @@ public class HdfsEntityDetails {
     private long blockSize;
     private long size;
     private short replication;
-    private String permission;
+    private String permissions;
 
     private static SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     
@@ -23,7 +23,7 @@ public class HdfsEntityDetails {
             long blockSize,
             long size,
             short replication,
-            String permission
+            String permissions
     ) {
         this.owner = owner;
         this.group = group;
@@ -32,7 +32,7 @@ public class HdfsEntityDetails {
         this.blockSize = blockSize;
         this.size = size;
         this.replication = replication;
-        this.permission = permission;
+        this.permissions = permissions;
     }
 
     public HdfsEntityDetails() {}
@@ -93,12 +93,12 @@ public class HdfsEntityDetails {
         this.replication = replication;
     }
 
-    public String getPermission() {
-        return permission;
+    public String getPermissions() {
+        return permissions;
     }
 
-    public void setPermission(String permission) {
-        this.permission = permission;
+    public void setPermissions(String permissions) {
+        this.permissions = permissions;
     }
 
     private static String toDateString(long val) {
