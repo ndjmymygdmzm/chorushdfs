@@ -5,8 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 
 public class V2PluginTest extends AbstractPluginTest {
 
@@ -22,8 +21,9 @@ public class V2PluginTest extends AbstractPluginTest {
 
     @Test
     public void testDetails() throws Exception {
-        HdfsEntityDetails details = hdfs.details("/election92.csv");
-        assertThat("it has the owner", details.getOwner(), is(ps.getProperty("gphd02.user")));
+        HdfsEntityDetails details = hdfs.details("/");
+        assertThat("it has the owner", details.getOwner(), is(notNullValue()));
+        assertThat("it has the block size", details.getBlockSize(), is(greaterThanOrEqualTo(0l)));
     }
 
 }
