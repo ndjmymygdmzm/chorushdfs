@@ -1,14 +1,19 @@
 package com.emc.greenplum.hadoop.plugins;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class HdfsEntityDetails {
     private String owner;
     private String group;
-    private long accessedAt;
-    private long modifiedAt;
+    private String accessedAt;
+    private String modifiedAt;
     private long blockSize;
     private long size;
     private short replication;
     private String permission;
+
+    private static SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     
     public HdfsEntityDetails(
             String owner,
@@ -22,8 +27,8 @@ public class HdfsEntityDetails {
     ) {
         this.owner = owner;
         this.group = group;
-        this.accessedAt = accessedAt;
-        this.modifiedAt = modifiedAt;
+        this.accessedAt = toDateString(accessedAt);
+        this.modifiedAt = toDateString(modifiedAt);
         this.blockSize = blockSize;
         this.size = size;
         this.replication = replication;
@@ -48,20 +53,20 @@ public class HdfsEntityDetails {
         this.group = group;
     }
 
-    public long getAccessedAt() {
+    public String getAccessedAt() {
         return accessedAt;
     }
 
     public void setAccessedAt(long accessedAt) {
-        this.accessedAt = accessedAt;
+        this.accessedAt = toDateString(accessedAt);
     }
 
-    public long getModifiedAt() {
+    public String getModifiedAt() {
         return modifiedAt;
     }
 
     public void setModifiedAt(long modifiedAt) {
-        this.modifiedAt = modifiedAt;
+        this.modifiedAt = toDateString(modifiedAt);
     }
 
     public long getBlockSize() {
@@ -94,5 +99,9 @@ public class HdfsEntityDetails {
 
     public void setPermission(String permission) {
         this.permission = permission;
+    }
+
+    private static String toDateString(long val) {
+        return format.format(new Date(val));
     }
 }
