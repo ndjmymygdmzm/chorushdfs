@@ -13,6 +13,7 @@
         <module>hdfs-plugin-v0-20-2mr</module>
         <module>hdfs-plugin-v1</module>
         <module>hdfs-plugin-v2</module>
+        <module>hdfs-plugin-v3</module>
         <module>hdfs-query-service</module>
     </modules>
 
@@ -28,7 +29,6 @@
                     <target>1.6</target>
                     <encoding>UTF-8</encoding>
                 </configuration>
-
             </plugin>
         </plugins>
     </build>

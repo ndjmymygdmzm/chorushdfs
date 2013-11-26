@@ -27,6 +27,21 @@ public enum HdfsVersion {
             "META-INF/external-deps/hadoop-common-2.0.2-alpha-gphd-2.0.1.jar",
             "META-INF/external-deps/hadoop-hdfs-2.0.2-alpha-gphd-2.0.1.jar"
     }),
+    V3("3.0.0", "META-INF/plugins/hdfs-plugin-v3-0.0.1.jar", new String[] {
+            "META-INF/external-deps/commons-logging-1.1.1.jar",
+            "META-INF/external-deps/commons-lang-2.5.jar",
+            "META-INF/external-deps/commons-configuration-1.6.jar",
+            "META-INF/external-deps/commons-cli-1.2.jar",
+            "META-INF/external-deps/slf4j-log4j12-1.6.1.jar",
+            "META-INF/external-deps/slf4j-api-1.6.1.jar",
+            "META-INF/external-deps/log4j-1.2.16.jar",
+            "META-INF/external-deps/protobuf-java-2.4.0a.jar",
+            "META-INF/external-deps/guava-13.0.1.jar",
+            "META-INF/external-deps/hadoop-auth-2.0.5-alpha-gphd-2.1.0.0.jar",
+            "META-INF/external-deps/hadoop-annotations-2.0.5-alpha-gphd-2.1.0.0.jar",
+            "META-INF/external-deps/hadoop-common-2.0.5-alpha-gphd-2.1.0.0.jar",
+            "META-INF/external-deps/hadoop-hdfs-2.0.5-alpha-gphd-2.1.0.0.jar"
+    }),
     V0202MAPR("0.20.2mr", "META-INF/plugins/hdfs-plugin-v0-20-2mr-0.0.1.jar", new String []{
             "META-INF/external-deps/commons-logging-1.1.1.jar",
             "META-INF/external-deps/maprfs-0.1.jar",
@@ -63,7 +78,7 @@ public enum HdfsVersion {
         return name;
     }
 
-    public String [] getDependencies() {
+    public String[] getDependencies() {
         return dependencies;
     }
 }
