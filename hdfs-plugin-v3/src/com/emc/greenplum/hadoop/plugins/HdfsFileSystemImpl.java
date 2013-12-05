@@ -4,6 +4,9 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.security.AnnotatedSecurityInfo;
+import org.apache.hadoop.security.SecurityInfo;
+import org.apache.hadoop.security.SecurityUtil;
 import org.apache.hadoop.security.UserGroupInformation;
 
 import java.io.BufferedReader;
@@ -39,6 +42,8 @@ public class HdfsFileSystemImpl extends HdfsFileSystemPlugin {
 
         try {
             if (isKerberos(config)) {
+                SecurityInfo securityInfo = new AnnotatedSecurityInfo();
+                SecurityUtil.setSecurityInfoProviders(securityInfo);
                 fileSystem = FileSystem.get(FileSystem.getDefaultUri(config), config);
             } else {
                 fileSystem = FileSystem.get(FileSystem.getDefaultUri(config), config, username);
