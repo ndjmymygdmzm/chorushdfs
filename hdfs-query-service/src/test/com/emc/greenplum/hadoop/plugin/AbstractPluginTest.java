@@ -9,7 +9,7 @@ import java.util.Properties;
 
 public class AbstractPluginTest {
 
-    static Properties ps = new Properties();
+    protected static Properties ps = new Properties();
     protected Hdfs hdfs;
 
     @BeforeClass

@@ -11,7 +11,7 @@ public class V0202mrPluginTest extends AbstractPluginTest {
 
     @Before
     public void setUp() throws Exception {
-        hdfs = hdfsForKey("gpmr12");
+        hdfs = hdfsForKey("mapr");
     }
 
     @Test

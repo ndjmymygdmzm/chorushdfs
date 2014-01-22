@@ -11,7 +11,7 @@ public class V1PluginTest extends AbstractPluginTest {
 
     @Before
     public void setUp() throws Exception {
-        hdfs = hdfsForKey("gphd11");
+        hdfs = hdfsForKey("apache12");
     }
 
     @Test
