@@ -26,11 +26,7 @@ public class HdfsFileSystemImpl extends HdfsFileSystemPlugin {
         Configuration config = new Configuration();
 
         config.set("fs.defaultFS", buildHdfsPath(host, port, isHA));
-
         config.set("fs.hdfs.impl", "org.apache.hadoop.hdfs.DistributedFileSystem");
-
-        // some magic to make file contents readable using the existing getContents implementation
-        config.set("dfs.client.use.legacy.blockreader", "true");
 
         if (parameters != null && parameters.size() > 0) {
             for (HdfsPair pair : parameters) {
@@ -106,7 +102,7 @@ public class HdfsFileSystemImpl extends HdfsFileSystemPlugin {
             try {
                 return fileSystem.exists(new Path("/"));
             } catch (IOException e) {
-                System.err.println("V2 plugin cannot load the filesystem root (\"/\")");
+                System.err.println("V3 plugin cannot load the filesystem root (\"/\")");
                 System.err.println(e.getMessage());
                 e.printStackTrace(System.err);
                 return false;
