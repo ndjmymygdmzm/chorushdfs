@@ -142,12 +142,7 @@ public class Hdfs {
             }
         });
 
-        if (fileSystem.loadedSuccessfully()) {
-            fileSystem.closeFileSystem();
-            return true;
-        } else {
-            return false;
-        }
+        return fileSystem.loadedSuccessfully();
     }
 
     private HdfsFileSystem loadFileSystem(String host, String port, String username, boolean isHA, List<HdfsPair> parameters) {
