@@ -4,7 +4,7 @@
 
     <groupId>com.example</groupId>
     <artifactId>hdfs-query-service</artifactId>
-    <version>0.0.10</version>
+    <version>0.0.11</version>
 
     <parent>
         <artifactId>hdfs-query-service-parent</artifactId>
@@ -119,6 +119,20 @@
             </resource>
             <resource>
                 <directory>${project.basedir}/../hdfs-plugin-v3/target</directory>
+                <includes>
+                    <include>**/hdfs-plugin*.jar</include>
+                </includes>
+                <targetPath>META-INF/plugins/</targetPath>
+            </resource>
+            <resource>
+                <directory>${project.basedir}/../hdfs-plugin-v4/lib</directory>
+                <includes>
+                    <include>**/*.jar</include>
+                </includes>
+                <targetPath>META-INF/external-deps/</targetPath>
+            </resource>
+            <resource>
+                <directory>${project.basedir}/../hdfs-plugin-v4/target</directory>
                 <includes>
                     <include>**/hdfs-plugin*.jar</include>
                 </includes>
