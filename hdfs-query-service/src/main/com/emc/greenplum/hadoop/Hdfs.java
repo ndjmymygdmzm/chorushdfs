@@ -8,6 +8,7 @@ import com.emc.greenplum.hadoop.plugins.HdfsFileSystem;
 import com.emc.greenplum.hadoop.plugins.HdfsPair;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -84,6 +85,29 @@ public class Hdfs {
         });
     }
 
+    public boolean importData(final String path, final InputStream is, final boolean overwrite) {
+        return execute(new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                try {
+                    return fileSystem.importData(path, is, overwrite);
+                } catch (IOException e) {
+                    return false;
+                }
+            }
+        });
+
+    }
+
+    public boolean delete(final String path) {
+        return protectTimeout(new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                return fileSystem.delete(path);
+            }
+        });
+    }
+
     public void closeFileSystem() {
         protectTimeout(new Callable() {
             @Override
@@ -99,11 +123,23 @@ public class Hdfs {
     }
 
     private static synchronized <T> T protectTimeout(Callable<T> command) {
+        return execute(command, true);
+    }
+
+    private static synchronized <T> T execute(Callable<T> command) {
+        return execute(command, false);
+    }
+
+    private static synchronized <T> T execute(Callable<T> command, boolean protectTimeout) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Future<T> future = executor.submit(command);
 
         try {
-            return future.get(timeout, TimeUnit.SECONDS);
+            if (protectTimeout) {
+                return future.get(timeout, TimeUnit.SECONDS);
+            } else {
+                return future.get();
+            }
         } catch (Exception e) {
             e.printStackTrace(loggerStream);
             return null;

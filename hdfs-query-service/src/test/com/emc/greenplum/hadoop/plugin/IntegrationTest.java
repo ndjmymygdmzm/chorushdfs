@@ -47,13 +47,6 @@ public class IntegrationTest extends AbstractPluginTest {
     }
 
     @Test
-    public void testPHD101() throws Exception {
-        Hdfs hdfs = hdfsForKey("phd101");
-        assertThat(hdfs.getVersion(), is(HdfsVersion.V2));
-        assertThat(hdfs.list("/").size(), is(not(0)));
-    }
-
-    @Test
     public void testGivingUpWhenTheSpecifiedVersionDoesNotConnect() throws Exception {
         Hdfs hdfs = new Hdfs(ps.getProperty("cdh4.hostname"), ps.getProperty("cdh4.port"), ps.getProperty("cdh4.user"), HdfsVersion.V1, false, null);
         assertNull(hdfs.list("/"));

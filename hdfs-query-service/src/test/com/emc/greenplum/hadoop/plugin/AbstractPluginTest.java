@@ -1,9 +1,8 @@
 package com.emc.greenplum.hadoop.plugin;
 
 import com.emc.greenplum.hadoop.Hdfs;
-import org.junit.BeforeClass;
+import org.junit.Before;
 
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Properties;
 
@@ -12,10 +11,11 @@ public class AbstractPluginTest {
     protected static Properties ps = new Properties();
     protected Hdfs hdfs;
 
-    @BeforeClass
-    public static void onlyOnce() throws Exception {
-        InputStream stream = new FileInputStream("src/test/com/emc/greenplum/hadoop/plugin/servers.properties");
+    @Before
+    public void onlyOnce() throws Exception {
+        InputStream stream = getClass().getResourceAsStream("/servers.properties");
         ps.load(stream);
+        stream.close();
     }
 
     protected Hdfs hdfsForKey(String key) {
@@ -26,5 +26,9 @@ public class AbstractPluginTest {
             false,
             null
         );
+    }
+
+    protected static void it(String message) {
+        System.out.println("[it] " + message);
     }
 }

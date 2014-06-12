@@ -157,6 +157,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
+                    <useFile>false</useFile>
                     <argLine>-Djava.library.path=${project.basedir}/../hdfs-plugin-v0-20-2mr/lib/native/</argLine>
                 </configuration>
             </plugin>

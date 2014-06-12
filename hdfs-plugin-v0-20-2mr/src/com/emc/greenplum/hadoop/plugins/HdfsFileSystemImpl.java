@@ -4,11 +4,9 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IOUtils;
 
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -128,5 +126,25 @@ public class HdfsFileSystemImpl extends HdfsFileSystemPlugin {
                 status.getReplication(),
                 status.getPermission().toString()
         );
+    }
+
+    @Override
+    public boolean importData(String path, InputStream is, boolean overwrite) throws IOException {
+        boolean created = true;
+        try {
+            OutputStream os = fileSystem.create(new Path(path), overwrite);
+            IOUtils.copyBytes(is, os, 4096, true);
+
+        } catch (IOException e) {
+            created = false;
+            System.out.println(e.getMessage());
+        }
+
+        return created;
+    }
+
+    @Override
+    public boolean delete(String path) throws IOException {
+        return fileSystem.delete(new Path(path), true);
     }
 }

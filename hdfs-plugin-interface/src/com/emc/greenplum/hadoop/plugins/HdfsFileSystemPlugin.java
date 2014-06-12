@@ -3,6 +3,7 @@ package com.emc.greenplum.hadoop.plugins;
 import org.xeustechnologies.jcl.JarClassLoader;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 
@@ -20,6 +21,12 @@ public abstract class HdfsFileSystemPlugin implements HdfsFileSystem {
 
     @Override
     public abstract HdfsEntityDetails details(String path) throws IOException;
+
+    @Override
+    public abstract boolean importData(String path, InputStream is, boolean overwrite) throws IOException;
+
+    @Override
+    public abstract boolean delete(String path) throws IOException;
 
     protected void restoreOriginalClassLoader() {
         Thread.currentThread().setContextClassLoader(originalClassLoader);
