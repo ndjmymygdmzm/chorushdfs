@@ -130,17 +130,9 @@ public class HdfsFileSystemImpl extends HdfsFileSystemPlugin {
 
     @Override
     public boolean importData(String path, InputStream is, boolean overwrite) throws IOException {
-        boolean created = true;
-        try {
-            OutputStream os = fileSystem.create(new Path(path), overwrite);
-            IOUtils.copyBytes(is, os, 4096, true);
-
-        } catch (IOException e) {
-            created = false;
-            System.out.println(e.getMessage());
-        }
-
-        return created;
+        OutputStream os = fileSystem.create(new Path(path), overwrite);
+        IOUtils.copyBytes(is, os, 4096, true);
+        return true;
     }
 
     @Override

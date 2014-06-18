@@ -1,5 +1,6 @@
 package com.emc.greenplum.hadoop.plugin;
 
+import com.emc.greenplum.hadoop.plugins.HdfsActionResult;
 import com.emc.greenplum.hadoop.plugins.HdfsEntityDetails;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,7 +46,7 @@ public class V4PluginTest extends AbstractPluginTest {
         clean();
 
         InputStream is = getClass().getResourceAsStream("/servers.properties");
-        boolean a = hdfs.importData(TARGET_PATH, is, false);
+        boolean a = hdfs.importData(TARGET_PATH, is, false).isSuccess();
         assertThat(a, is(true));
 
         List<String> content = hdfs.content(TARGET_PATH, 10);
@@ -60,8 +61,8 @@ public class V4PluginTest extends AbstractPluginTest {
 
         InputStream is = getClass().getResourceAsStream("/servers.properties");
         InputStream is2 = new ByteArrayInputStream("123".getBytes());
-        boolean first = hdfs.importData(TARGET_PATH, is, false);
-        boolean second = hdfs.importData(TARGET_PATH, is2, false);
+        boolean first = hdfs.importData(TARGET_PATH, is, false).isSuccess();
+        boolean second = hdfs.importData(TARGET_PATH, is2, false).isSuccess();
         assertThat(first, is(true));
         assertThat(second, is(false));
         assertThat(hdfs.content(TARGET_PATH, 1).get(0), not(containsString("123")));
@@ -76,13 +77,31 @@ public class V4PluginTest extends AbstractPluginTest {
 
         InputStream is = getClass().getResourceAsStream("/servers.properties");
         InputStream is2 = new ByteArrayInputStream("123".getBytes());
-        boolean first = hdfs.importData(TARGET_PATH, is, false);
-        boolean second = hdfs.importData(TARGET_PATH, is2, true);
+        boolean first = hdfs.importData(TARGET_PATH, is, false).isSuccess();
+        boolean second = hdfs.importData(TARGET_PATH, is2, true).isSuccess();
         assertThat(first, is(true));
         assertThat(second, is(true));
         assertThat(hdfs.content(TARGET_PATH, 1).get(0), is(containsString("123")));
 
         clean();
+    }
+
+    @Test
+    public void testFailureIncludesMessageAndExceptionInWrapper() throws Exception {
+        clean();
+
+        InputStream is = getClass().getResourceAsStream("/servers.properties");
+        InputStream is2 = new ByteArrayInputStream("123".getBytes());
+        hdfs.importData(TARGET_PATH, is, false).isSuccess();
+        HdfsActionResult second = hdfs.importData(TARGET_PATH, is2, false);
+
+        assertThat(second.isSuccess(), is(false));
+        assertThat(second.getMessage(), is(notNullValue()));
+        assertThat(second.getException(), is(notNullValue()));
+        assertThat(hdfs.content(TARGET_PATH, 1).get(0), not(containsString("123")));
+
+        clean();
+
     }
 
     private void clean() {

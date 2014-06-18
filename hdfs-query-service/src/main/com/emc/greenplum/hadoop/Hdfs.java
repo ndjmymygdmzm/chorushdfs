@@ -2,14 +2,12 @@ package com.emc.greenplum.hadoop;
 
 import com.emc.greenplum.hadoop.plugin.HdfsCachedPluginBuilder;
 import com.emc.greenplum.hadoop.plugin.HdfsPluginBuilder;
-import com.emc.greenplum.hadoop.plugins.HdfsEntity;
-import com.emc.greenplum.hadoop.plugins.HdfsEntityDetails;
-import com.emc.greenplum.hadoop.plugins.HdfsFileSystem;
-import com.emc.greenplum.hadoop.plugins.HdfsPair;
+import com.emc.greenplum.hadoop.plugins.*;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.lang.reflect.UndeclaredThrowableException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
@@ -85,18 +83,19 @@ public class Hdfs {
         });
     }
 
-    public boolean importData(final String path, final InputStream is, final boolean overwrite) {
-        return execute(new Callable<Boolean>() {
+    public HdfsActionResult importData(final String path, final InputStream is, final boolean overwrite) throws IOException {
+        return execute(new Callable<HdfsActionResult>() {
             @Override
-            public Boolean call() throws Exception {
+            public HdfsActionResult call() throws IOException {
                 try {
-                    return fileSystem.importData(path, is, overwrite);
-                } catch (IOException e) {
-                    return false;
+                    boolean success = fileSystem.importData(path, is, overwrite);
+                    return new HdfsActionResult(success);
+                } catch (UndeclaredThrowableException ute) {
+                    Exception e = (Exception) ute.getCause().getCause();
+                    return new HdfsActionResult(false, e.getMessage(), e);
                 }
             }
         });
-
     }
 
     public boolean delete(final String path) {
