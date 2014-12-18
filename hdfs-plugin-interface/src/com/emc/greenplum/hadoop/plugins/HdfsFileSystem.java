@@ -10,6 +10,8 @@ import java.util.List;
 public interface HdfsFileSystem {
     void loadFileSystem(String host, String port, String username, boolean isHA, List<HdfsPair> parameters);
 
+    void loadFileSystem(String host, String port, String username, boolean isHA, List<HdfsPair> parameters, String connectionName);
+
     void closeFileSystem();
 
     boolean loadedSuccessfully();

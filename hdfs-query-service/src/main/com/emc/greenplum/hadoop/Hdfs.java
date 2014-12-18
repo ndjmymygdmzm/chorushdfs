@@ -29,6 +29,10 @@ public class Hdfs {
     }
 
     public Hdfs(String host, String port, String username, HdfsVersion version, boolean isHA, List<HdfsPair> parameters) {
+        this(host, port, username, version, isHA, parameters, "");
+    }
+
+    public Hdfs(String host, String port, String username, HdfsVersion version, boolean isHA, List<HdfsPair> parameters, String connectionName) {
          if(version == null){
              this.version = detectVersion(host, port, username, isHA, parameters);
          }
@@ -36,7 +40,7 @@ public class Hdfs {
              this.version = version;
          }
 
-         this.fileSystem = loadFileSystem(host, port, username, isHA, parameters);
+         this.fileSystem = loadFileSystem(host, port, username, isHA, parameters, connectionName);
      }
 
     public Hdfs(String host, String port, String username, String versionName, boolean isHA, List<HdfsPair> parameters) {

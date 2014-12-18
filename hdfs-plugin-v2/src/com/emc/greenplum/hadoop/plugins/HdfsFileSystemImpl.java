@@ -21,6 +21,10 @@ public class HdfsFileSystemImpl extends HdfsFileSystemPlugin {
 
     @Override
     public void loadFileSystem(String host, String port, String username, boolean isHA, List<HdfsPair> parameters) {
+        loadFileSystem(host, port, username, isHA, parameters, "");
+    }
+    @Override
+    public void loadFileSystem(String host, String port, String username, boolean isHA, List<HdfsPair> parameters, String connectionName) {
         loadHadoopClassLoader();
         Configuration config = new Configuration();
 
@@ -43,7 +47,11 @@ public class HdfsFileSystemImpl extends HdfsFileSystemPlugin {
             if (isKerberos(config)) {
                 SecurityInfo securityInfo = new AnnotatedSecurityInfo();
                 SecurityUtil.setSecurityInfoProviders(securityInfo);
-                fileSystem = FileSystem.get(FileSystem.getDefaultUri(config), config);
+                UserGroupInformation ugi = HdfsSecurityUtil.getCachedGroupInfo(connectionName, config.get(HdfsSecurityUtil.ALPINE_PRINCIPAL));
+                if (ugi == null) {
+                    ugi = HdfsSecurityUtil.kerberosInitForHDFS(config, host, port, connectionName, isHA);
+                }
+                fileSystem = HdfsSecurityUtil.getHadoopFileSystem(configuration, ugi, host, port, isHA);
             } else {
                 fileSystem = FileSystem.get(FileSystem.getDefaultUri(config), config, username);
             }
