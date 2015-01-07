@@ -25,27 +25,31 @@ public class Hdfs {
     }
 
     public Hdfs(String host, String port, String username, boolean isHA, List<HdfsPair> parameters) {
-        this(host, port, username, detectVersion(host, port, username, isHA, parameters), isHA, parameters);
+        this(host, port, username, detectVersion(host, port, username, isHA, parameters, "", ""),  "", "", isHA, parameters);
     }
 
     public Hdfs(String host, String port, String username, HdfsVersion version, boolean isHA, List<HdfsPair> parameters) {
-        this(host, port, username, version, isHA, parameters, "");
+        this(host, port, username, version, "", "", isHA, parameters);
     }
 
-    public Hdfs(String host, String port, String username, HdfsVersion version, boolean isHA, List<HdfsPair> parameters, String connectionName) {
+    public Hdfs(String host, String port, String username, String versionName, boolean isHA, List<HdfsPair> parameters) {
+        this(host, port, username, HdfsVersion.findVersion(versionName),  "", "", isHA, parameters);
+    }
+
+    public Hdfs(String host, String port, String username, String versionName, String connectionName, String chorusUsername, boolean isHA, List<HdfsPair> parameters) {
+        this(host, port, username, HdfsVersion.findVersion(versionName), connectionName, chorusUsername, isHA, parameters);
+    }
+
+    public Hdfs(String host, String port, String username, HdfsVersion version, String connectionName, String chorusUsername, boolean isHA, List<HdfsPair> parameters) {
          if(version == null){
-             this.version = detectVersion(host, port, username, isHA, parameters);
+             this.version = detectVersion(host, port, username, isHA, parameters, connectionName, chorusUsername);
          }
-         else if (checkVersion(host, port, username, version, isHA, parameters)) {
+         else if (checkVersion(host, port, username, version, isHA, parameters, connectionName, chorusUsername)) {
              this.version = version;
          }
 
-         this.fileSystem = loadFileSystem(host, port, username, isHA, parameters, connectionName);
+         this.fileSystem = loadFileSystem(host, port, username, isHA, parameters, connectionName, chorusUsername);
      }
-
-    public Hdfs(String host, String port, String username, String versionName, boolean isHA, List<HdfsPair> parameters) {
-        this(host, port, username, HdfsVersion.findVersion(versionName), isHA, parameters);
-    }
 
     public HdfsVersion getVersion() {
         return version;
@@ -160,23 +164,23 @@ public class Hdfs {
         return pluginLoader;
     }
 
-    private static HdfsVersion detectVersion(String host, String port, String username, boolean isHA, List<HdfsPair> parameters) {
+    private static HdfsVersion detectVersion(String host, String port, String username, boolean isHA, List<HdfsPair> parameters, String connectionName, String chorusUsername) {
         for (HdfsVersion version : HdfsVersion.values()) {
-            if (checkVersion(host, port, username, version, isHA, parameters)) {
+            if (checkVersion(host, port, username, version, isHA, parameters, connectionName, chorusUsername)) {
                 return version;
             }
         }
         return null;
     }
 
-    private static boolean checkVersion(final String host, final String port, final String username, HdfsVersion version, final boolean isHA, final List<HdfsPair> parameters) {
+    private static boolean checkVersion(final String host, final String port, final String username, HdfsVersion version, final boolean isHA, final List<HdfsPair> parameters, final String connectionName, final String chorusUsername) {
         if (version == null) { return false; }
         HdfsFileSystem fileSystem = getPluginLoader().fileSystem(version);
 
         final HdfsFileSystem fileSystem1 = fileSystem;
         protectTimeout(new Callable() {
             public Object call() {
-                fileSystem1.loadFileSystem(host, port, username, isHA, parameters);
+                fileSystem1.loadFileSystem(host, port, username, isHA, parameters, connectionName, chorusUsername);
                 return null;
             }
         });
@@ -185,12 +189,16 @@ public class Hdfs {
     }
 
     private HdfsFileSystem loadFileSystem(String host, String port, String username, boolean isHA, List<HdfsPair> parameters) {
+        return loadFileSystem(host, port, username, isHA, parameters, "", "");
+    }
+
+    private HdfsFileSystem loadFileSystem(String host, String port, String username, boolean isHA, List<HdfsPair> parameters, String connectionName, String chorusUsername) {
         if (version == null) {
             return null;
         }
 
         HdfsFileSystem fileSystem = getPluginLoader().fileSystem(version);
-        fileSystem.loadFileSystem(host, port, username, isHA, parameters);
+        fileSystem.loadFileSystem(host, port, username, isHA, parameters, connectionName, chorusUsername);
         return fileSystem;
     }
 }

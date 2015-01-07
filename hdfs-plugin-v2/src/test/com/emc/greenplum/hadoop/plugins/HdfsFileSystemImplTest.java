@@ -28,7 +28,7 @@ public class HdfsFileSystemImplTest {
     @Test
     public void testHdfsFileSystemImpl() {
         HdfsFileSystem hdfs = new HdfsFileSystemImpl();
-        hdfs.loadFileSystem(properties.getProperty("gphd20.hostname"), properties.getProperty("gphd20.port"), properties.getProperty("gphd20.user"), false, null);
+        hdfs.loadFileSystem(properties.getProperty("gphd20.hostname"), properties.getProperty("gphd20.port"), properties.getProperty("gphd20.user"), false, null, "", "");
         assertNotNull(hdfs);
     }
 }

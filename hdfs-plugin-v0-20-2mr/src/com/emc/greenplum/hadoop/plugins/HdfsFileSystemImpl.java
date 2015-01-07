@@ -16,11 +16,7 @@ public class HdfsFileSystemImpl extends HdfsFileSystemPlugin {
     private FileSystem fileSystem;
 
     @Override
-    public void loadFileSystem(String host, String port, String username, boolean isHA, List<HdfsPair> parameters) {
-        loadFileSystem(host, port, username, isHA, parameters, "");
-    }
-    @Override
-    public void loadFileSystem(String host, String port, String username, boolean isHA, List<HdfsPair> parameters, String connectionName) {
+    public void loadFileSystem(String host, String port, String username, boolean isHA, List<HdfsPair> parameters, String connectionName, String chorusUsername) {
         loadHadoopClassLoader();
 
         Configuration config = new Configuration();
