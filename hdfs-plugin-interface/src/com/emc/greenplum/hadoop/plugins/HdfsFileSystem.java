@@ -8,7 +8,7 @@ import java.util.List;
 
 
 public interface HdfsFileSystem {
-    void loadFileSystem(String host, String port, String username, boolean isHA, List<HdfsPair> parameters, String connectionName, String chorusUsername);
+    void loadFileSystem(String host, String port, String username, boolean isHA, boolean isMapR, List<HdfsPair> parameters, String connectionName, String chorusUsername);
 
     void closeFileSystem();
 

@@ -173,14 +173,14 @@ public class Hdfs {
         return null;
     }
 
-    private static boolean checkVersion(final String host, final String port, final String username, HdfsVersion version, final boolean isHA, final List<HdfsPair> parameters, final String connectionName, final String chorusUsername) {
+    private static boolean checkVersion(final String host, final String port, final String username, final HdfsVersion version, final boolean isHA, final List<HdfsPair> parameters, final String connectionName, final String chorusUsername) {
         if (version == null) { return false; }
         HdfsFileSystem fileSystem = getPluginLoader().fileSystem(version);
 
         final HdfsFileSystem fileSystem1 = fileSystem;
         protectTimeout(new Callable() {
             public Object call() {
-                fileSystem1.loadFileSystem(host, port, username, isHA, parameters, connectionName, chorusUsername);
+                fileSystem1.loadFileSystem(host, port, username, isHA, version.getName().equals("0.20.2mr"), parameters, connectionName, chorusUsername);
                 return null;
             }
         });
@@ -198,7 +198,7 @@ public class Hdfs {
         }
 
         HdfsFileSystem fileSystem = getPluginLoader().fileSystem(version);
-        fileSystem.loadFileSystem(host, port, username, isHA, parameters, connectionName, chorusUsername);
+        fileSystem.loadFileSystem(host, port, username, isHA, version.getName().equals("0.20.2mr"), parameters, connectionName, chorusUsername);
         return fileSystem;
     }
 }

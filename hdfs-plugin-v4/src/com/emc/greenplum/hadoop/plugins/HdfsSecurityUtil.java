@@ -45,20 +45,13 @@ public class HdfsSecurityUtil {
         return ugiMap.get(connName + "_" + principal);
     }
 
-    public static UserGroupInformation createUserForHDFS(String user, Configuration configuration, String host, String port, String connectionName, boolean isHA, String chorusUsername) throws Exception {
-
-        UserGroupInformation loginUser = kerberosInitForHDFS(configuration, host, port, connectionName, isHA);
-        return createProxyUser((chorusUsername == null || chorusUsername.isEmpty() ? user : chorusUsername), loginUser);
-    }
-
-
     // Log in using Kerberos
-    public static UserGroupInformation kerberosInitForHDFS(Configuration configuration, String host, String port, String connectionName, boolean isHA) throws Exception {
+    public static UserGroupInformation kerberosInitForHDFS(Configuration configuration, String host, String port, String connectionName, boolean isHA, boolean isMapR) throws Exception {
         String principal = configuration.get(ALPINE_PRINCIPAL);
         String keyTab = configuration.get(ALPINE_KEYTAB);
 
         UserGroupInformation ugi = kerberosLogin(principal, keyTab, configuration, host, port, connectionName, isHA);
-        addHDFSDelegationToken(configuration, ugi, host, port, isHA);
+        addHDFSDelegationToken(configuration, ugi, host, port, isHA, isMapR);
         return ugi;
     }
 
@@ -70,10 +63,11 @@ public class HdfsSecurityUtil {
 
     // Perform actual get from HDFS
 
-    public static FileSystem getHadoopFileSystem(Configuration configuration, UserGroupInformation ugi, String hostname, String port, boolean isHA) throws Exception {
+    public static FileSystem getHadoopFileSystem(Configuration configuration, UserGroupInformation ugi, String hostname, String port, boolean isHA, boolean isMapR) throws Exception {
 
         final Configuration finalConfiguration = configuration;
-        final String hdfsURL = "hdfs://" + hostname + (isHA ? ":" + Integer.parseInt(port) : "");
+        String scheme = isMapR ? "maprfs://" : "hdfs://";
+        final String hdfsURL = scheme + hostname + (isHA ? "" : ":" + Integer.parseInt(port));
 
         PrivilegedExceptionAction<FileSystem> action = new PrivilegedExceptionAction<FileSystem>(){
 
@@ -82,34 +76,18 @@ public class HdfsSecurityUtil {
                 return FileSystem.get(URI.create(hdfsURL), finalConfiguration);
             }
         };
-        return (FileSystem)performPrivilegedExceptionAction(ugi, action);
+        return ugi.doAs(action);
 
     }
 
-    public static void addHDFSDelegationToken(Configuration configuration, UserGroupInformation ugi, String hostname, String port, boolean isHA) throws Exception{
+    public static void addHDFSDelegationToken(Configuration configuration, UserGroupInformation ugi, String hostname, String port, boolean isHA, boolean isMapR) throws Exception{
 
         if (!hdfsTokenUGIs.contains(ugi)) {
-            FileSystem fs = getHadoopFileSystem(configuration, ugi, hostname, port, isHA);
+            FileSystem fs = getHadoopFileSystem(configuration, ugi, hostname, port, isHA, isMapR);
 
             Token<DelegationTokenIdentifier> dfsToken = (Token<DelegationTokenIdentifier>)fs.getDelegationToken(ugi.getShortUserName());
             ugi.addToken(new Text(HDFS_DELEGATION_TOKEN), dfsToken);
             hdfsTokenUGIs.add(ugi);
-        }
-
-    }
-
-    public static String getHDFSPrefixFromUrl(String url) {
-        if (url == null || url.isEmpty()) {
-            return HDFS_PREFIX;
-        }
-        else {
-            int index = url.indexOf("//");
-            if (index < 0 || index - 2 <= 0) {
-                return url;
-            }
-            else {
-                return url.substring(0, index - 2);
-            }
         }
 
     }
@@ -137,9 +115,6 @@ public class HdfsSecurityUtil {
         else {
             target += url.getPort();
         }
-        if (port.isEmpty() || port == "-1") {
-            target = getHDFSPrefixFromUrl(hdfsUrl) + InetAddress.getLocalHost().getHostName() + ":50070";
-        }
 
         String loginPrincipal = getReplacedPrincipal(principal, InetAddress.getLocalHost().getHostName(), port);
         UserGroupInformation ugi = UserGroupInformation.loginUserFromKeytabAndReturnUGI(loginPrincipal, keyTabLocation);
@@ -158,53 +133,6 @@ public class HdfsSecurityUtil {
         String localprincipal = org.apache.hadoop.security.SecurityUtil.getServerPrincipal(principal, addr);
         return localprincipal;
 
-    }
-
-    public static Object performPrivilegedExceptionAction(UserGroupInformation ugi,
-                                                          PrivilegedExceptionAction  action) throws  Exception {
-        Method[] methods = UserGroupInformation.class.getMethods();
-
-        for (Method method : methods) {
-            if (method.getName().equals(METHOD_DOAS)
-                    && method.getParameterTypes()[0]
-                    .equals(PrivilegedExceptionAction.class)) {
-                try {
-                    return method.invoke(ugi, action);
-                } catch (Exception e) {//nullpoint, empty...
-                    //itsLogger.error(StackTraceLogger.getErrString(e),e); 80855410
-                    if (e instanceof InvocationTargetException) {
-                        Throwable targetException = ((InvocationTargetException) e).getTargetException();
-                        if (targetException instanceof UndeclaredThrowableException) {
-                            Throwable ue = ((UndeclaredThrowableException) targetException).getUndeclaredThrowable();
-                            /*if(ue instanceof EmptyFileException){//this is for pivotalhd 11
-                                throw (EmptyFileException) ue;
-                            }
-                            else*/
-                            if (ue instanceof PrivilegedActionException) {
-                                throw ((PrivilegedActionException) ue).getException();
-                            }  else if (ue instanceof Exception) {
-                                throw ((Exception) ue) ;//this for the change in CD5, see 69201736
-                            }
-                            else {
-                                throw e;
-                            }
-                        } else {
-                            if (((InvocationTargetException) e).getTargetException() != null
-                                    && ((InvocationTargetException) e).getTargetException() instanceof Exception) {
-                                throw (Exception) ((InvocationTargetException) e).getTargetException();
-                            } else {
-                                throw e;
-                            }
-
-                        }
-                    } else {
-                        throw e;
-                    }
-                }
-
-            }
-        }
-        return null;
     }
 
 }

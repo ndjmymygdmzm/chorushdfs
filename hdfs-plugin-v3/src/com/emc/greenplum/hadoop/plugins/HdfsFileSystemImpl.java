@@ -19,14 +19,14 @@ public class HdfsFileSystemImpl extends HdfsFileSystemPlugin {
     private FileSystem fileSystem;
 
     @Override
-    public void loadFileSystem(String host, String port, String username, boolean isHA, List<HdfsPair> parameters, String connectionName, String chorusUsername) {
+    public void loadFileSystem(String host, String port, String username, boolean isHA, boolean isMapR, List<HdfsPair> parameters, String connectionName, String chorusUsername) {
         loadHadoopClassLoader();
         Configuration config = new Configuration();
 
         config.set("fs.defaultFS", buildHdfsPath(host, port, isHA));
         config.set("fs.hdfs.impl", "org.apache.hadoop.hdfs.DistributedFileSystem");
 
-        if (config.get("hadoop.security.authentication", "").equalsIgnoreCase("simple")) {
+        if (config.get("hadoop.security.authentication", "simple").equalsIgnoreCase("simple")) {
             config.set("ipc.client.fallback-to-simple-auth-allowed", "true");
         }
 
@@ -44,12 +44,10 @@ public class HdfsFileSystemImpl extends HdfsFileSystemPlugin {
                 SecurityUtil.setSecurityInfoProviders(securityInfo);
                 UserGroupInformation ugi = HdfsSecurityUtil.getCachedUserGroupInfo(connectionName, config.get(HdfsSecurityUtil.ALPINE_PRINCIPAL));
                 if (ugi == null) {
-                    ugi = HdfsSecurityUtil.kerberosInitForHDFS(config, host, port, connectionName, isHA);
+                    ugi = HdfsSecurityUtil.kerberosInitForHDFS(config, host, port, connectionName, isHA, isMapR);
                 }
-                else {
-                    ugi = HdfsSecurityUtil.createProxyUser((chorusUsername == null || chorusUsername.isEmpty() ? username : chorusUsername), ugi);
-                }
-                fileSystem = HdfsSecurityUtil.getHadoopFileSystem(config, ugi, host, port, isHA);
+                UserGroupInformation proxyUGI = HdfsSecurityUtil.createProxyUser((chorusUsername == null || chorusUsername.isEmpty() ? username : chorusUsername), ugi);
+                fileSystem = HdfsSecurityUtil.getHadoopFileSystem(config, proxyUGI, host, port, isHA, isMapR);
             } else {
                 fileSystem = FileSystem.get(FileSystem.getDefaultUri(config), config, username);
             }
