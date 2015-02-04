@@ -39,11 +39,14 @@ public class HdfsSecurityUtil {
     // import scala.collection.mutable
     private static Map<String, HdfsExpirableUGI> ugiMap = new HashMap<String, HdfsExpirableUGI>();
 
+    private static final long EXPIRATION_TIME = 10*60*60*1000;
+
     // Retrieve cached UGI object based on Hadoop connection name and principal
     public static UserGroupInformation getCachedUserGroupInfo(String connName, String host, String principal) {
         String key = connName + "_" + host + "_" + principal;
         Date now = new Date(System.currentTimeMillis());
-        if(ugiMap.containsKey(key) && now.compareTo(ugiMap.get(key).getTimeCreated()) < 0) {
+
+        if(ugiMap.containsKey(key) && (now.getTime() - ugiMap.get(key).getTimeCreated().getTime() < EXPIRATION_TIME)) {
             return ugiMap.get(key).getUserGroupInformation();
         }
 
