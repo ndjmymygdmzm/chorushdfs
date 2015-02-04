@@ -37,12 +37,17 @@ public class HdfsSecurityUtil {
     public static final String HDFS_PREFIX = "hdfs://";
 
     // import scala.collection.mutable
-    private static Map<String, UserGroupInformation> ugiMap = new HashMap<String, UserGroupInformation>();
-    private static Set<UserGroupInformation> hdfsTokenUGIs = new HashSet<UserGroupInformation>();
+    private static Map<String, HdfsExpirableUGI> ugiMap = new HashMap<String, HdfsExpirableUGI>();
 
     // Retrieve cached UGI object based on Hadoop connection name and principal
-    public static UserGroupInformation getCachedUserGroupInfo(String connName, String principal) {
-        return ugiMap.get(connName + "_" + principal);
+    public static UserGroupInformation getCachedUserGroupInfo(String connName, String host, String principal) {
+        String key = connName + "_" + host + "_" + principal;
+        Date now = new Date(System.currentTimeMillis());
+        if(ugiMap.containsKey(key) && now.compareTo(ugiMap.get(key).getTimeCreated()) < 0) {
+            return ugiMap.get(key).getUserGroupInformation();
+        }
+
+        return null;
     }
 
     // Log in using Kerberos
@@ -50,8 +55,7 @@ public class HdfsSecurityUtil {
         String principal = configuration.get(ALPINE_PRINCIPAL);
         String keyTab = configuration.get(ALPINE_KEYTAB);
 
-        UserGroupInformation ugi = kerberosLogin(principal, keyTab, configuration, host, port, connectionName, isHA);
-        addHDFSDelegationToken(configuration, ugi, host, port, isHA, isMapR);
+        UserGroupInformation ugi = kerberosLogin(principal, keyTab, configuration, host, port, connectionName, isHA, false);
         return ugi;
     }
 
@@ -63,7 +67,7 @@ public class HdfsSecurityUtil {
 
     // Perform actual get from HDFS
 
-    public static FileSystem getHadoopFileSystem(Configuration configuration, UserGroupInformation ugi, String hostname, String port, boolean isHA, boolean isMapR) throws Exception {
+    public static FileSystem getHadoopFileSystem(Configuration configuration, UserGroupInformation ugi, String hostname, String port, String connectionName, boolean isHA, boolean isMapR) throws Exception {
 
         final Configuration finalConfiguration = configuration;
         String scheme = isMapR ? "maprfs://" : "hdfs://";
@@ -76,26 +80,33 @@ public class HdfsSecurityUtil {
                 return FileSystem.get(URI.create(hdfsURL), finalConfiguration);
             }
         };
-        return ugi.doAs(action);
 
-    }
-
-    public static void addHDFSDelegationToken(Configuration configuration, UserGroupInformation ugi, String hostname, String port, boolean isHA, boolean isMapR) throws Exception{
-
-        if (!hdfsTokenUGIs.contains(ugi)) {
-            FileSystem fs = getHadoopFileSystem(configuration, ugi, hostname, port, isHA, isMapR);
-
-            Token<DelegationTokenIdentifier> dfsToken = (Token<DelegationTokenIdentifier>)fs.getDelegationToken(ugi.getShortUserName());
-            ugi.addToken(new Text(HDFS_DELEGATION_TOKEN), dfsToken);
-            hdfsTokenUGIs.add(ugi);
+        try {
+            return ugi.doAs(action);
         }
-
+        catch(Exception e) {
+            String principal = configuration.get(ALPINE_PRINCIPAL);
+            String keyTab = configuration.get(ALPINE_KEYTAB);
+            UserGroupInformation reloginUGI = kerberosLogin(principal, keyTab, configuration, hostname, port, connectionName, isHA, true);
+            return reloginUGI.doAs(action);
+        }
     }
 
     // Use Kerberos login and cache resulting UGI
-    public static UserGroupInformation kerberosLogin(String principal, String keyTabLocation, Configuration configuration, String host, String port, String connectionName, boolean isHA) throws Exception{
+    public static UserGroupInformation kerberosLogin(String principal, String keyTabLocation, Configuration configuration, String host, String port, String connectionName, boolean isHA, boolean isReLogin) throws Exception{
 
-        String key = connectionName + "_" + principal;
+        String key = connectionName + "_" + host + "_" + principal;
+
+        if(isReLogin && ugiMap.containsKey(key)) {
+            UserGroupInformation oldUgi = ugiMap.get(key).getUserGroupInformation();
+            try {
+                oldUgi.checkTGTAndReloginFromKeytab();
+                return oldUgi;
+            }
+            catch (Exception e) {
+                // otherwise, something went wrong, let's just log them back in
+            }
+        }
 
         if (principal == null || principal.isEmpty()) {
             throw new NullPointerException(" Principal is null");
@@ -119,7 +130,9 @@ public class HdfsSecurityUtil {
         String loginPrincipal = getReplacedPrincipal(principal, InetAddress.getLocalHost().getHostName(), port);
         UserGroupInformation ugi = UserGroupInformation.loginUserFromKeytabAndReturnUGI(loginPrincipal, keyTabLocation);
 
-        ugiMap.put(key, ugi);
+        HdfsExpirableUGI expirableUGI = new HdfsExpirableUGI(ugi);
+
+        ugiMap.put(key, expirableUGI);
 
         return ugi;
     }

@@ -42,12 +42,12 @@ public class HdfsFileSystemImpl extends HdfsFileSystemPlugin {
             if (isKerberos(config)) {
                 SecurityInfo securityInfo = new AnnotatedSecurityInfo();
                 SecurityUtil.setSecurityInfoProviders(securityInfo);
-                UserGroupInformation ugi = HdfsSecurityUtil.getCachedUserGroupInfo(connectionName, config.get(HdfsSecurityUtil.ALPINE_PRINCIPAL));
+                UserGroupInformation ugi = HdfsSecurityUtil.getCachedUserGroupInfo(connectionName, host, config.get(HdfsSecurityUtil.ALPINE_PRINCIPAL));
                 if (ugi == null) {
                     ugi = HdfsSecurityUtil.kerberosInitForHDFS(config, host, port, connectionName, isHA, isMapR);
                 }
                 UserGroupInformation proxyUGI = HdfsSecurityUtil.createProxyUser((chorusUsername == null || chorusUsername.isEmpty() ? username : chorusUsername), ugi);
-                fileSystem = HdfsSecurityUtil.getHadoopFileSystem(config, proxyUGI, host, port, isHA, isMapR);
+                fileSystem = HdfsSecurityUtil.getHadoopFileSystem(config, proxyUGI, host, port, connectionName, isHA, isMapR);
             } else {
                 fileSystem = FileSystem.get(FileSystem.getDefaultUri(config), config, username);
             }
