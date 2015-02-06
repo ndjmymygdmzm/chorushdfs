@@ -48,6 +48,13 @@ public class HdfsFileSystemImpl extends HdfsFileSystemPlugin {
                 }
                 UserGroupInformation proxyUGI = HdfsSecurityUtil.createProxyUser((chorusUsername == null || chorusUsername.isEmpty() ? username : chorusUsername), ugi);
                 fileSystem = HdfsSecurityUtil.getHadoopFileSystem(config, proxyUGI, host, port, connectionName, isHA, isMapR);
+                if(!loadedSuccessfully()) {
+                    if(checkForExpiredTicket()) {
+                        ugi = HdfsSecurityUtil.kerberosInitForHDFS(config, host, port, connectionName, isHA, isMapR);
+                        proxyUGI = HdfsSecurityUtil.createProxyUser((chorusUsername == null || chorusUsername.isEmpty() ? username : chorusUsername), ugi);
+                        fileSystem = HdfsSecurityUtil.getHadoopFileSystem(config, proxyUGI, host, port, connectionName, isHA, isMapR);
+                    }
+                }
             } else {
                 fileSystem = FileSystem.get(FileSystem.getDefaultUri(config), config, username);
             }
@@ -114,6 +121,26 @@ public class HdfsFileSystemImpl extends HdfsFileSystemPlugin {
                 e.printStackTrace(System.err);
                 return false;
             }
+        } else {
+            return false;
+        }
+    }
+
+    private boolean checkForExpiredTicket() {
+        if (fileSystem != null) {
+            try {
+                fileSystem.exists(new Path("/"));
+            }
+            catch (IOException e) {
+                String message = e.getMessage();
+                System.err.println(e.getMessage());
+                System.err.println("IOException");
+                if(message.contains("InvalidToken") || message.contains("SaslException") || message.contains("GSSException")) {
+                    return true;
+                }
+                return false;
+            }
+            return false;
         } else {
             return false;
         }

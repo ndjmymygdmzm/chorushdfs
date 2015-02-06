@@ -84,15 +84,7 @@ public class HdfsSecurityUtil {
             }
         };
 
-        try {
-            return ugi.doAs(action);
-        }
-        catch(Exception e) {
-            String principal = configuration.get(ALPINE_PRINCIPAL);
-            String keyTab = configuration.get(ALPINE_KEYTAB);
-            UserGroupInformation reloginUGI = kerberosLogin(principal, keyTab, configuration, hostname, port, connectionName, isHA, true);
-            return reloginUGI.doAs(action);
-        }
+        return ugi.doAs(action);
     }
 
     // Use Kerberos login and cache resulting UGI
