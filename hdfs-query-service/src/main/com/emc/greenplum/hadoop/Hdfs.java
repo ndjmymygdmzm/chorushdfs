@@ -11,6 +11,8 @@ import java.lang.reflect.UndeclaredThrowableException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 public class Hdfs {
     public static int timeout = 5;
@@ -19,6 +21,10 @@ public class Hdfs {
     private static PrintStream loggerStream = System.out;
     private final HdfsFileSystem fileSystem;
     private HdfsVersion version;
+
+    private static final String ACCESS_ERROR_STRING = "!!!ACCESS_DENIED_ERROR!!!";
+    private static final String ACCESS_CONTROL_EXCEPTION = "org.apache.hadoop.security.AccessControlException";
+    private static final String PERMISSION_DENIED = "Permission denied";
 
     public static void setLoggerStream(PrintStream stream) {
         loggerStream = stream;
@@ -62,6 +68,20 @@ public class Hdfs {
                     return fileSystem.list(path);
                 } catch (IOException e) {
                     return new ArrayList<HdfsEntity>();
+                } catch (Exception e) {
+                    StringWriter sw = new StringWriter();
+                    PrintWriter pw = new PrintWriter(sw);
+                    e.printStackTrace(pw);
+                    String trace = sw.toString();
+
+                    if(trace.contains(ACCESS_CONTROL_EXCEPTION) && trace.contains(PERMISSION_DENIED)) {
+                        HdfsEntity entity = new HdfsEntity();
+                        entity.setPath(ACCESS_ERROR_STRING);
+                        List<HdfsEntity> list = new ArrayList<HdfsEntity>();
+                        list.add(entity);
+                        return list;
+                    }
+                    return new ArrayList<HdfsEntity>();
                 }
             }
         });
@@ -73,6 +93,17 @@ public class Hdfs {
                 try {
                     return fileSystem.getContent(path, lineCount);
                 } catch (IOException e) {
+                    return new ArrayList<String>();
+                } catch (Exception e) {
+                    StringWriter sw = new StringWriter();
+                    PrintWriter pw = new PrintWriter(sw);
+                    e.printStackTrace(pw);
+                    String trace = sw.toString();
+                    if(trace.contains(ACCESS_CONTROL_EXCEPTION) && trace.contains(PERMISSION_DENIED)) {
+                        List<String> list = new ArrayList<String>();
+                        list.add(ACCESS_ERROR_STRING);
+                        return list;
+                    }
                     return new ArrayList<String>();
                 }
             }
