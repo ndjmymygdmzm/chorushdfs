@@ -61,9 +61,9 @@ public class Hdfs {
         return version;
     }
 
-    public List<HdfsEntity> list(final String path) {
+    public List<HdfsEntity> list(final String path) throws Exception{
         return protectTimeout(new Callable<List<HdfsEntity>>() {
-            public List<HdfsEntity> call() {
+            public List<HdfsEntity> call() throws Exception{
                 try {
                     return fileSystem.list(path);
                 } catch (IOException e) {
@@ -81,7 +81,7 @@ public class Hdfs {
                         list.add(entity);
                         return list;
                     }
-                    return new ArrayList<HdfsEntity>();
+                    throw e;
                 }
             }
         });
