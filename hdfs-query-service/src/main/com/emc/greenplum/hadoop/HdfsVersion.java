@@ -59,13 +59,23 @@ public enum HdfsVersion {
             "META-INF/external-deps/hadoop-auth-2.2.0-cdh5.0.0-beta-1.jar",
             "META-INF/external-deps/hadoop-annotations-2.2.0-cdh5.0.0-beta-1.jar",
             "META-INF/external-deps/hadoop-common-2.2.0-cdh5.0.0-beta-1.jar",
-            "META-INF/external-deps/hadoop-hdfs-2.2.0-cdh5.0.0-beta-1.jar"
+            "META-INF/external-deps/hadoop-hdfs-2.2.0-cdh5.0.0-beta-1.jar",
+            "META-INF/external-deps/hive-exec-0.13.1-cdh5.2.0.jar",
+            "META-INF/external-deps/hive-jdbc-0.13.1-cdh5.2.0.jar",
+            "META-INF/external-deps/hive-metastore-0.13.1-cdh5.2.0.jar",
+            "META-INF/external-deps/hive-service-0.13.1-cdh5.2.0.jar",
+            "META-INF/external-deps/hive-shims-0.13.1-cdh5.2.0.jar"
     }),
     V0202MAPR("0.20.2mr", "META-INF/plugins/hdfs-plugin-v0-20-2mr-0.0.1.jar", new String []{
             "META-INF/external-deps/commons-logging-1.1.1.jar",
             "META-INF/external-deps/maprfs-0.1.jar",
             "META-INF/external-deps/zookeeper-3.3.2.jar",
-            "META-INF/external-deps/hadoop-0.20.2mr-core.jar"
+            "META-INF/external-deps/hadoop-0.20.2mr-core.jar",
+            "META-INF/external-deps/hive-exec-0.13.0-mapr-1405.jar",
+            "META-INF/external-deps/hive-jdbc-0.13.0-mapr-1405.jar",
+            "META-INF/external-deps/hive-metastore-0.13.0-mapr-1405.jar",
+            "META-INF/external-deps/hive-service-0.13.0-mapr-1405.jar",
+            "META-INF/external-deps/hive-shims-0.13.0-mapr-1405.jar"
     });
 
     private String pluginJar;

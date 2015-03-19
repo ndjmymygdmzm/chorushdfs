@@ -100,6 +100,41 @@
             <artifactId>log4j</artifactId>
             <version>1.2.16</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.hive</groupId>
+            <artifactId>hive-exec</artifactId>
+            <version>0.13.1-cdh5.2.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/hive-exec-0.13.1-cdh5.2.0.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hive</groupId>
+            <artifactId>hive-jdbc</artifactId>
+            <version>0.13.1-cdh5.2.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/hive-exec-0.13.1-cdh5.2.0.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hive</groupId>
+            <artifactId>hive-metastore</artifactId>
+            <version>0.13.1-cdh5.2.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/hive-exec-0.13.1-cdh5.2.0.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hive</groupId>
+            <artifactId>hive-service</artifactId>
+            <version>0.13.1-cdh5.2.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/hive-exec-0.13.1-cdh5.2.0.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hive</groupId>
+            <artifactId>hive-shims</artifactId>
+            <version>0.13.1-cdh5.2.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/hive-exec-0.13.1-cdh5.2.0.jar</systemPath>
+        </dependency>
     </dependencies>
 
     <properties>

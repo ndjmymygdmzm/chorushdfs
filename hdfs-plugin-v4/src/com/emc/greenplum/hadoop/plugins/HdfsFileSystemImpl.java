@@ -14,9 +14,22 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.sql.Connection;
 
 public class HdfsFileSystemImpl extends HdfsFileSystemPlugin {
     private FileSystem fileSystem;
+
+    @Override
+    public Connection getHiveConnection(String host, String user, String password) throws Exception {
+        loadHadoopClassLoader();
+        return HdfsSecurityUtil.getHiveConnection(host, user, password);
+    }
+
+    @Override
+    public Connection getHiveKerberosConnection(String host, String user, String principal, String keytab) throws Exception {
+        loadHadoopClassLoader();
+        return HdfsSecurityUtil.getHiveKerberosConnection(host, user, principal, keytab);
+    }
 
     @Override
     public void loadFileSystem(String host, String port, String username, boolean isHA, boolean isMapR, List<HdfsPair> parameters, String connectionName, String chorusUsername) {

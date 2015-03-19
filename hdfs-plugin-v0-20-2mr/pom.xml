@@ -30,6 +30,41 @@
             <artifactId>jcl-core</artifactId>
             <version>2.3</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.hive</groupId>
+            <artifactId>hive-exec</artifactId>
+            <version>0.13.0-mapr-1405</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/hive-exec-0.13.0-mapr-1405.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hive</groupId>
+            <artifactId>hive-jdbc</artifactId>
+            <version>0.13.0-mapr-1405</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/hive-jdbc-0.13.0-mapr-1405.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hive</groupId>
+            <artifactId>hive-metastore</artifactId>
+            <version>0.13.0-mapr-1405</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/hive-metastore-0.13.0-mapr-1405.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hive</groupId>
+            <artifactId>hive-service</artifactId>
+            <version>0.13.0-mapr-1405</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/hive-service-0.13.0-mapr-1405.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hive</groupId>
+            <artifactId>hive-shims</artifactId>
+            <version>0.13.0-mapr-1405</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/hive-shims-0.13.0-mapr-1405.jar</systemPath>
+        </dependency>
     </dependencies>
 
     <properties>

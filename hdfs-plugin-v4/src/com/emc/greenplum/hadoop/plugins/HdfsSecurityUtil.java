@@ -8,6 +8,8 @@ import java.net.InetAddress;
 import java.net.URI;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.util.*;
 import java.util.logging.*;
 import java.io.*;
@@ -35,11 +37,47 @@ public class HdfsSecurityUtil {
     public static final String AUTHENTICATION_KEY = "hadoop.security.authentication";
     public static final String PROPERTY_FS_NAME = "fs.default.name";
     public static final String HDFS_PREFIX = "hdfs://";
+    public static final String DRIVER_NAME = "org.apache.hive.jdbc.HiveDriver";
 
     // import scala.collection.mutable
     private static Map<String, HdfsExpirableUGI> ugiMap = new HashMap<String, HdfsExpirableUGI>();
 
     private static final long EXPIRATION_TIME = 10*60*60*1000;
+
+    public static Connection getHiveConnection(String host, String user, String password) throws Exception {
+        Class.forName(DRIVER_NAME);
+        return DriverManager.getConnection(host, user, password);
+    }
+
+    public static Connection getHiveKerberosConnection(String host, String user, String principal, String keytab) throws Exception {
+        Class.forName(DRIVER_NAME);
+        Configuration configuration = new Configuration();
+        configuration.set(AUTHENTICATION_KEY, "kerberos");
+        java.lang.System.setProperty("java.security.krb5.realm", "ALPINENOW.LOCAL");
+        java.lang.System.setProperty("java.security.krb5.kdc", "kerberos.alpinenow.local");
+
+        UserGroupInformation.setConfiguration(configuration);
+
+        UserGroupInformation ugi = null;
+        ugi = UserGroupInformation.loginUserFromKeytabAndReturnUGI(principal, keytab);
+
+        final String finalHost = host;
+        final String finalPrincipal = principal;
+        final String finalUser = user;
+        PrivilegedExceptionAction<Connection> action = new PrivilegedExceptionAction<Connection>(){
+
+            public Connection run() throws Exception {
+
+                Connection conn = DriverManager.getConnection(finalHost + "/;principal=" + finalPrincipal + ";hive.server2.proxy.user=" + finalUser);
+                return conn;
+            }
+
+        };
+
+        Connection conn = ugi.doAs(action);
+
+        return conn;
+    }
 
     // Retrieve cached UGI object based on Hadoop connection name and principal
     public static UserGroupInformation getCachedUserGroupInfo(String connName, String host, String principal) {
