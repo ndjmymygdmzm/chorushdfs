@@ -42,8 +42,6 @@ public class HdfsSecurityUtil {
         Class.forName(DRIVER_NAME);
         Configuration configuration = new Configuration();
         configuration.set(AUTHENTICATION_KEY, "kerberos");
-        java.lang.System.setProperty("java.security.krb5.realm", "ALPINENOW.LOCAL");
-        java.lang.System.setProperty("java.security.krb5.kdc", "kerberos.alpinenow.local");
 
         UserGroupInformation.setConfiguration(configuration);
 
